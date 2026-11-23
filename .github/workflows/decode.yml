@@ -1,0 +1,23 @@
+name: decode
+on:
+  push:
+    paths:
+      - 'menu/*.b64'
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: decode
+        run: |
+          for f in menu/*.b64; do base64 -d "$f" > "${f%.b64}"; done
+      - name: commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add menu/
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "decode menu assets"
+          git push
